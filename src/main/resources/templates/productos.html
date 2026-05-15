@@ -1,54 +1,213 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <title>Productos</title>
+    <title>Inventario</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+          rel="stylesheet">
+
 </head>
 
-<body class="container mt-5">
+<body class="bg-light">
 
-<h1>Inventario</h1>
+<nav class="navbar navbar-dark bg-dark shadow">
 
-<table class="table table-bordered">
+    <div class="container-fluid">
 
-    <thead>
+        <span class="navbar-brand mb-0 h1">
 
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Stock</th>
-        <th>Activo</th>
-    </tr>
+            <i class="bi bi-box-seam"></i>
+            Sistema Inventario Castores
 
-    </thead>
+        </span>
 
-    <tbody>
+        <form th:action="@{/logout}" method="post">
 
-    <tr th:each="producto : ${productos}">
+            <button type="submit"
+                    class="btn btn-outline-light">
 
-        <td th:text="${producto.id}"></td>
+                Cerrar Sesión
 
-        <td th:text="${producto.nombre}"></td>
+            </button>
 
-        <td th:text="${producto.descripcion}"></td>
+        </form>
 
-        <td th:text="${producto.stock}"></td>
+    </div>
 
-        <td th:text="${producto.activo}"></td>
+</nav>
 
-    </tr>
+<div class="container mt-5">
 
-    </tbody>
+    <div class="card shadow">
 
-</table>
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+
+                    <h2 class="fw-bold">
+                        Inventario Productos
+                    </h2>
+                    <div th:if="${param.error}"
+                         class="alert alert-danger">
+
+                        Stock insuficiente para realizar salida.
+
+                    </div>
+
+                    <p class="text-muted">
+                        Administración de inventario
+                    </p>
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <a href="/movimientos"
+                       sec:authorize="hasRole('ADMIN')"
+                       class="btn btn-dark">
+
+                        <i class="bi bi-clock-history"></i>
+                        Historial
+
+                    </a>
+
+                    <a href="/productos/nuevo"
+                       sec:authorize="hasRole('ADMIN')"
+                       class="btn btn-primary">
+
+                        <i class="bi bi-plus-circle"></i>
+                        Nuevo Producto
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Stock</th>
+                        <th>Estatus</th>
+                        <th>Acciones</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:each="producto : ${productos}">
+
+                        <td th:text="${producto.id}"></td>
+
+                        <td class="fw-semibold"
+                            th:text="${producto.nombre}">
+                        </td>
+
+                        <td th:text="${producto.descripcion}"></td>
+
+                        <td>
+
+                            <span class="badge bg-primary fs-6"
+                                  th:text="${producto.stock}">
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <span
+                                    th:if="${producto.activo}"
+                                    class="badge bg-success">
+
+                                ACTIVO
+
+                            </span>
+
+                            <span
+                                    th:unless="${producto.activo}"
+                                    class="badge bg-danger">
+
+                                INACTIVO
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <div class="d-flex gap-2">
+
+                                <a th:href="@{/productos/entrada/{id}(id=${producto.id})}"
+                                   sec:authorize="hasRole('ADMIN')"
+                                   class="btn btn-success btn-sm">
+
+                                    <i class="bi bi-box-arrow-in-down"></i>
+
+                                    Entrada
+
+                                </a>
+
+                                <a th:href="@{/productos/salida/{id}(id=${producto.id})}"
+                                   sec:authorize="hasRole('ALMACENISTA')"
+                                   class="btn btn-danger btn-sm">
+
+                                    <i class="bi bi-box-arrow-up"></i>
+
+                                    Salida
+
+                                </a>
+
+                                <a th:href="@{/productos/toggle/{id}(id=${producto.id})}"
+                                   sec:authorize="hasRole('ADMIN')"
+                                   class="btn btn-warning btn-sm">
+
+    <span th:if="${producto.activo}">
+        Baja
+    </span>
+
+                                    <span th:unless="${producto.activo}">
+        Reactivar
+    </span>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 
